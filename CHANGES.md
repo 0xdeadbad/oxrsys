@@ -6,6 +6,10 @@ This file tracks user-facing, integration-facing, and runtime-relevant changes f
 
 ### Added
 
+- Vulkan swapchains accept `XR_SWAPCHAIN_USAGE_TRANSFER_DST_BIT` and create those images with
+  `VK_IMAGE_USAGE_TRANSFER_DST_BIT`, as Metal swapchains already did. OpenComposite copies each texture
+  an OpenVR game submits into its swapchain image, and asks for this usage; before, its swapchains
+  failed with `XR_ERROR_FEATURE_UNSUPPORTED` and the game got no frames to the headset.
 - Added `render_device = "quest3_native"` (2064x2208 per eye), the Quest 3 panel resolution,
   also selectable in Home.
 - Added the USB network transport (`transport = "usb_ncm"`, USB Net in Home). Home switches the
