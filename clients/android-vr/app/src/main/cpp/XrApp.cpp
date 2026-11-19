@@ -1805,6 +1805,11 @@ bool XrApp::SetupActions()
     strncpy(actionInfo.localizedActionName, "B/Y Button", XR_MAX_LOCALIZED_ACTION_NAME_SIZE);
     XR_CHECK(xrCreateAction(actionSet_, &actionInfo, &bButtonAction_), "xrCreateAction(b_button)");
 
+    // Thumbstick click (boolean, both hands)
+    strncpy(actionInfo.actionName, "thumbstick_click", XR_MAX_ACTION_NAME_SIZE);
+    strncpy(actionInfo.localizedActionName, "Thumbstick Click", XR_MAX_LOCALIZED_ACTION_NAME_SIZE);
+    XR_CHECK(xrCreateAction(actionSet_, &actionInfo, &thumbstickClickAction_), "xrCreateAction(thumbstick_click)");
+
     // Menu button (boolean, left hand only)
     actionInfo.countSubactionPaths = 1;
     actionInfo.subactionPaths = &handPaths_[0]; // left hand
@@ -1819,7 +1824,7 @@ bool XrApp::SetupActions()
     strncpy(actionInfo.localizedActionName, "Haptic", XR_MAX_LOCALIZED_ACTION_NAME_SIZE);
     XR_CHECK(xrCreateAction(actionSet_, &actionInfo, &hapticAction_), "xrCreateAction(haptic)");
 
-    XrPath bindingPaths[17];
+    XrPath bindingPaths[19];
     xrStringToPath(instance_, "/user/hand/left/input/grip/pose", &bindingPaths[0]);
     xrStringToPath(instance_, "/user/hand/right/input/grip/pose", &bindingPaths[1]);
     xrStringToPath(instance_, "/user/hand/left/input/aim/pose", &bindingPaths[2]);
@@ -1837,6 +1842,8 @@ bool XrApp::SetupActions()
     xrStringToPath(instance_, "/user/hand/left/input/menu/click", &bindingPaths[14]);
     xrStringToPath(instance_, "/user/hand/left/output/haptic", &bindingPaths[15]);
     xrStringToPath(instance_, "/user/hand/right/output/haptic", &bindingPaths[16]);
+    xrStringToPath(instance_, "/user/hand/left/input/thumbstick/click", &bindingPaths[17]);
+    xrStringToPath(instance_, "/user/hand/right/input/thumbstick/click", &bindingPaths[18]);
 
     XrActionSuggestedBinding bindingsWithAim[] = {
         {gripPoseAction_, bindingPaths[0]},
@@ -1856,6 +1863,8 @@ bool XrApp::SetupActions()
         {menuAction_, bindingPaths[14]},
         {hapticAction_, bindingPaths[15]},
         {hapticAction_, bindingPaths[16]},
+        {thumbstickClickAction_, bindingPaths[17]},
+        {thumbstickClickAction_, bindingPaths[18]},
     };
     XrActionSuggestedBinding bindingsWithoutAim[] = {
         {gripPoseAction_, bindingPaths[0]},
@@ -1873,6 +1882,8 @@ bool XrApp::SetupActions()
         {menuAction_, bindingPaths[14]},
         {hapticAction_, bindingPaths[15]},
         {hapticAction_, bindingPaths[16]},
+        {thumbstickClickAction_, bindingPaths[17]},
+        {thumbstickClickAction_, bindingPaths[18]},
     };
 
     const char* controllerProfiles[] = {
@@ -5481,6 +5492,14 @@ protocol::TrackingPacket XrApp::BuildTrackingPacket(XrTime predictedDisplayTime)
     if (readBooleanAction(menuAction_, handPaths_[0]))
     {
         buttons |= protocol::BUTTON_MENU;
+    }
+    if (readBooleanAction(thumbstickClickAction_, handPaths_[0]))
+    {
+        buttons |= protocol::BUTTON_LEFT_THUMBSTICK;
+    }
+    if (readBooleanAction(thumbstickClickAction_, handPaths_[1]))
+    {
+        buttons |= protocol::BUTTON_RIGHT_THUMBSTICK;
     }
     packet.buttonState = buttons;
 

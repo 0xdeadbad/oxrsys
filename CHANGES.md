@@ -123,6 +123,10 @@ This file tracks user-facing, integration-facing, and runtime-relevant changes f
 
 ### Fixed
 
+- Fixed thumbstick clicks on the Quest/Pico client. The runtime maps `thumbstick/click` to
+  `BUTTON_LEFT_THUMBSTICK` and `BUTTON_RIGHT_THUMBSTICK`, but the client never bound the click, so the bits
+  were never sent and actions on it never fired (Vivecraft's jump and sneak). The client now binds
+  `thumbstick/click` on both hands and sends both bits.
 - Fixed the current interaction profile before a client connects. With nothing tracked, the runtime reported
   `khr/simple_controller` until a client connected, and apps that bind the first profile they see at session start
   (Pistol Whip, on Unity's OpenXR plugin) kept it and ignored the later switch to Touch; Pistol Whip never drew
